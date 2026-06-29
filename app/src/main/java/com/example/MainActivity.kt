@@ -33,6 +33,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -92,6 +94,12 @@ fun LanStreamApp(modifier: Modifier = Modifier) {
     val serverPort by ServerManager.serverPort.collectAsState()
     val serverUrl by ServerManager.serverUrl.collectAsState()
     val sharedFiles by ServerManager.sharedFiles.collectAsState()
+
+    val activeTransfers by ServerManager.activeTransfers.collectAsState()
+    val discoveredInstances by DiscoveryManager.discoveredInstances.collectAsState()
+    val isScanning by DiscoveryManager.isScanning.collectAsState()
+    val connectedDevices by ServerManager.connectedDevices.collectAsState()
+    var selectedTab by remember { mutableStateOf(0) }
 
     var showSettingsDialog by remember { mutableStateOf(false) }
     var inputPort by remember { mutableStateOf(serverPort.toString()) }
@@ -177,9 +185,10 @@ fun LanStreamApp(modifier: Modifier = Modifier) {
                 }
             )
 
+            // Real-time visual progress indicator for media files being transferred/accessed
+            ActiveTransfersSection(activeTransfers = activeTransfers, connectedDevices = connectedDevices)
+
             // Tab-based Navigation for Media vs Device Control
-            var selectedTab by remember { mutableStateOf(0) }
-            val connectedDevices by ServerManager.connectedDevices.collectAsState()
 
             // Section Header and File Management List
             Card(
@@ -219,7 +228,18 @@ fun LanStreamApp(modifier: Modifier = Modifier) {
                             icon = Icons.Rounded.Devices,
                             badgeCount = connectedDevices.size,
                             onClick = { selectedTab = 1 },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1.1f)
+                        )
+                        TabButton(
+                            text = "Discover LAN",
+                            selected = selectedTab == 2,
+                            icon = Icons.Rounded.Wifi,
+                            badgeCount = discoveredInstances.size,
+                            onClick = {
+                                selectedTab = 2
+                                DiscoveryManager.scanNetwork(context)
+                            },
+                            modifier = Modifier.weight(1.1f)
                         )
                     }
 
@@ -288,7 +308,7 @@ fun LanStreamApp(modifier: Modifier = Modifier) {
                                 }
                             }
                         }
-                    } else {
+                    } else if (selectedTab == 1) {
                         DeviceAccessList(
                             devices = connectedDevices,
                             onToggleBlock = { ip ->
@@ -298,6 +318,14 @@ fun LanStreamApp(modifier: Modifier = Modifier) {
                             onClearHistory = {
                                 ServerManager.clearDevices()
                                 Toast.makeText(context, "Connection history cleared", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    } else {
+                        LanDiscoverySection(
+                            discoveredInstances = discoveredInstances,
+                            isScanning = isScanning,
+                            onScanClick = {
+                                DiscoveryManager.scanNetwork(context)
                             }
                         )
                     }
@@ -1196,5 +1224,427 @@ fun formatRelativeTime(timestamp: Long): String {
         diff < 60000 -> "${diff / 1000}s ago"
         diff < 3600000 -> "${diff / 60000}m ago"
         else -> "Active today"
+    }
+}
+
+@Composable
+fun ActiveTransfersSection(
+    activeTransfers: Map<String, FileTransferProgress>,
+    connectedDevices: List<ConnectedDevice>
+) {
+    if (activeTransfers.isEmpty()) return
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = CyberCard),
+        border = CardBorder()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.SwapCalls,
+                    contentDescription = null,
+                    tint = CyberAccent,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Live Network Streams",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+
+            activeTransfers.values.forEach { transfer ->
+                val deviceName = connectedDevices.firstOrNull { it.ipAddress == transfer.ipAddress }?.displayName ?: "Remote Client"
+                
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = transfer.fileName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "Streaming to $deviceName (${transfer.ipAddress})",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = CyberMuted,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        
+                        Text(
+                            text = "${(transfer.progress * 100).toInt()}%",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = CyberAccent
+                        )
+                    }
+
+                    LinearProgressIndicator(
+                        progress = transfer.progress,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = CyberAccent,
+                        trackColor = CyberBorder
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${formatBytes(transfer.bytesTransferred)} / ${formatBytes(transfer.totalBytes)}",
+                            style = androidx.compose.ui.text.TextStyle(fontSize = 11.sp, color = CyberMuted)
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(6.dp)
+                                    .background(CyberAccent, CircleShape)
+                            )
+                            Text(
+                                text = "Transmitting",
+                                style = androidx.compose.ui.text.TextStyle(fontSize = 11.sp, color = CyberAccent)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LanDiscoverySection(
+    discoveredInstances: List<DiscoveredInstance>,
+    isScanning: Boolean,
+    onScanClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "Discovered LAN Devices",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Detecting active streamyLAN servers on Wi-Fi",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CyberMuted
+                )
+            }
+            
+            Button(
+                onClick = onScanClick,
+                enabled = !isScanning,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = CyberPrimary,
+                    disabledContainerColor = CyberPrimary.copy(alpha = 0.5f)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                if (isScanning) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Scanning...", style = MaterialTheme.typography.labelMedium)
+                } else {
+                    Icon(Icons.Rounded.Search, contentDescription = "Scan", modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Scan LAN", style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+
+        if (isScanning && discoveredInstances.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                RadarScannerAnimation()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Pinging subnet...",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    "Broadcasting UDP packets to discover other streamyLAN nodes on local subnet.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CyberMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
+        } else if (discoveredInstances.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.SignalWifiStatusbarNull,
+                    tint = CyberMuted,
+                    modifier = Modifier.size(48.dp),
+                    contentDescription = "No devices"
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    "No Devices Detected",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Make sure other devices on this Wi-Fi have streamyLAN active, and their server is running. Tap Scan to search again.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CyberMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onScanClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = CyberPrimary),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Scan Now")
+                }
+            }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(discoveredInstances.size) { index ->
+                    val instance = discoveredInstances[index]
+                    DiscoveredInstanceItem(instance = instance)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DiscoveredInstanceItem(instance: DiscoveredInstance) {
+    val context = LocalContext.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.2f)),
+        border = CardBorder()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color(0xFF1E293B), RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Tv,
+                        contentDescription = null,
+                        tint = CyberAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = instance.deviceName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = instance.serverUrl,
+                        style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                        color = CyberPrimary
+                    )
+                    
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .background(CyberAccent.copy(alpha = 0.15f), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "${instance.activeFilesCount} Shared Media Files",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = CyberAccent,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Button(
+                onClick = {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(instance.serverUrl))
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Could not open server url", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = CyberAccent),
+                shape = RoundedCornerShape(6.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                modifier = Modifier.height(32.dp)
+            ) {
+                Text(
+                    text = "Connect",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RadarScannerAnimation(modifier: Modifier = Modifier) {
+    val transition = rememberInfiniteTransition(label = "radar")
+    val rotation by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotation"
+    )
+    val alpha by transition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
+
+    Box(
+        modifier = modifier.size(120.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val radius = size.minDimension / 2.0f
+            val center = size / 2.0f
+            
+            // Draw grid concentric circles
+            drawCircle(color = CyberPrimary.copy(alpha = 0.15f), radius = radius, style = Stroke(width = 1.dp.toPx()))
+            drawCircle(color = CyberPrimary.copy(alpha = 0.1f), radius = radius * 0.66f, style = Stroke(width = 1.dp.toPx()))
+            drawCircle(color = CyberPrimary.copy(alpha = 0.05f), radius = radius * 0.33f, style = Stroke(width = 1.dp.toPx()))
+            
+            // Draw crosshairs
+            drawLine(
+                color = CyberPrimary.copy(alpha = 0.1f),
+                start = androidx.compose.ui.geometry.Offset(center.width, 0f),
+                end = androidx.compose.ui.geometry.Offset(center.width, size.height),
+                strokeWidth = 1.dp.toPx()
+            )
+            drawLine(
+                color = CyberPrimary.copy(alpha = 0.1f),
+                start = androidx.compose.ui.geometry.Offset(0f, center.height),
+                end = androidx.compose.ui.geometry.Offset(size.width, center.height),
+                strokeWidth = 1.dp.toPx()
+            )
+        }
+        
+        // Rotating radar sweep
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .drawBehind {
+                    rotate(rotation) {
+                        drawArc(
+                            brush = Brush.sweepGradient(
+                                colors = listOf(
+                                    CyberAccent.copy(alpha = 0.4f),
+                                    Color.Transparent
+                                )
+                            ),
+                            startAngle = 0f,
+                            sweepAngle = 90f,
+                            useCenter = true
+                        )
+                    }
+                }
+        )
+        
+        Icon(
+            imageVector = Icons.Rounded.Wifi,
+            contentDescription = null,
+            tint = CyberAccent.copy(alpha = alpha),
+            modifier = Modifier.size(36.dp)
+        )
     }
 }

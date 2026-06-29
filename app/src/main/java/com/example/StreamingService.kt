@@ -57,6 +57,7 @@ class StreamingService : Service() {
         server?.start()
 
         ServerManager.onServerStarted(ip, port)
+        DiscoveryManager.startReceiver(this, port)
 
         val notification = buildNotification("Running", "Active at http://$ip:$port")
         
@@ -80,6 +81,7 @@ class StreamingService : Service() {
         server?.stop()
         server = null
         ServerManager.onServerStopped()
+        DiscoveryManager.stopReceiver()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)

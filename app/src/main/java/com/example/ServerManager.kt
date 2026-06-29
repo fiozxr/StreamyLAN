@@ -153,5 +153,46 @@ object ServerManager {
     fun onServerStopped() {
         _isServerRunning.value = false
         _serverUrl.value = null
+        _activeTransfers.value = emptyMap()
     }
+
+    private val _activeTransfers = MutableStateFlow<Map<String, FileTransferProgress>>(emptyMap())
+    val activeTransfers = _activeTransfers.asStateFlow()
+
+    fun updateTransferProgress(ip: String, fileId: String, fileName: String, bytesTransferred: Long, totalBytes: Long) {
+        val key = "${ip}_${fileId}"
+        val currentMap = _activeTransfers.value.toMutableMap()
+        if (bytesTransferred >= totalBytes) {
+            currentMap.remove(key)
+        } else {
+            currentMap[key] = FileTransferProgress(
+                ipAddress = ip,
+                fileName = fileName,
+                fileId = fileId,
+                bytesTransferred = bytesTransferred,
+                totalBytes = totalBytes,
+                lastActive = System.currentTimeMillis()
+            )
+        }
+        _activeTransfers.value = currentMap
+    }
+
+    fun removeTransfer(ip: String, fileId: String) {
+        val key = "${ip}_${fileId}"
+        val currentMap = _activeTransfers.value.toMutableMap()
+        currentMap.remove(key)
+        _activeTransfers.value = currentMap
+    }
+}
+
+data class FileTransferProgress(
+    val ipAddress: String,
+    val fileName: String,
+    val fileId: String,
+    val bytesTransferred: Long,
+    val totalBytes: Long,
+    val lastActive: Long = System.currentTimeMillis()
+) {
+    val progress: Float
+        get() = if (totalBytes > 0) bytesTransferred.toFloat() / totalBytes else 0f
 }
