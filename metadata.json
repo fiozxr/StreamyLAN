@@ -1,0 +1,6 @@
+{
+  "name": "streamyLAN",
+  "description": "Stream videos, movies, and media from your Android device to other devices in the LAN via browser, with support for cURL, wget, and access management dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
