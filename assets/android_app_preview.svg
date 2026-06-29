@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 800" width="100%" height="100%" style="font-family: system-ui, -apple-system, sans-serif;">
+  <!-- Background Definitions -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#180e30" />
+      <stop offset="100%" stop-color="#05030a" />
+    </radialGradient>
+    <linearGradient id="cyberPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="cyberAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="blockBtn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <filter id="neonPulse" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="lightGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Mobile phone frame -->
+  <rect width="450" height="800" rx="40" fill="url(#bg)" />
+  <rect width="450" height="800" rx="40" fill="none" stroke="#2c1e47" stroke-width="4" />
+
+  <!-- Speaker Notch / Dynamic Island -->
+  <rect x="150" y="15" width="150" height="25" rx="12" fill="#0d0a14" />
+  
+  <!-- Status Bar -->
+  <g transform="translate(40, 52)" fill="#8b5cf6" opacity="0.8" font-size="11" font-weight="bold">
+    <text x="0" y="0">streamyLAN</text>
+    <text x="350" y="0" text-anchor="end">20:49 PM</text>
+  </g>
+
+  <!-- Top App Bar -->
+  <g transform="translate(30, 95)">
+    <!-- App Logo -->
+    <rect width="42" height="42" rx="10" fill="url(#cyberPrimary)" filter="url(#lightGlow)" />
+    <!-- Cast Icon representation in logo -->
+    <path d="M12 28h4v-4h-4v4zm0-8h4V14h-4v6zm14 8h4v-14h-4v14zm-7 0h4v-9h-4v9zm-13-19v26h30V9H6zm28 24H8V11h26v22z" fill="#ffffff" transform="translate(4,4) scale(0.9)"/>
+    
+    <!-- App Name and Tagline -->
+    <text x="56" y="22" fill="#ffffff" font-size="20" font-weight="900" letter-spacing="1">streamy<tspan fill="#a855f7">LAN</tspan></text>
+    <text x="56" y="36" fill="#8b5cf6" font-size="10" font-weight="bold" letter-spacing="0.5">HIGH-PERFORMANCE SERVER HUB</text>
+  </g>
+
+  <!-- Server Control Panel (Pulsing Center Button) -->
+  <g transform="translate(30, 165)">
+    <rect width="390" height="150" rx="18" fill="#140f25" stroke="#2c1e47" stroke-width="1.5" />
+    
+    <!-- Central Pulsing Glow Core -->
+    <circle cx="75" cy="75" r="45" fill="#10b981" fill-opacity="0.08" filter="url(#neonPulse)" />
+    <circle cx="75" cy="75" r="32" fill="#10b981" fill-opacity="0.15" />
+    
+    <!-- Active Status Inner Circle Button -->
+    <circle cx="75" cy="75" r="22" fill="url(#cyberAccent)" filter="url(#lightGlow)"/>
+    <!-- Pause Icon Lines inside play button -->
+    <rect x="67" y="65" width="5" height="20" rx="1" fill="#ffffff" />
+    <rect x="78" y="65" width="5" height="20" rx="1" fill="#ffffff" />
+
+    <!-- Connection Info (Right part of the card) -->
+    <text x="145" y="48" fill="#ffffff" font-size="16" font-weight="bold">Server is Active</text>
+    <text x="145" y="68" fill="#10b981" font-size="10" font-weight="bold" letter-spacing="1">STREAMING IN LOCAL WI-FI</text>
+    
+    <rect x="145" y="82" width="220" height="30" rx="6" fill="#0b0814" stroke="#22173d" stroke-width="1" />
+    <text x="155" y="101" fill="#a855f7" font-size="11" font-weight="bold" font-family="monospace">http://192.168.1.14:8080</text>
+    <!-- Simple Cast icon placeholder -->
+    <path d="M340 91h14v14h-14zm-4 4h2v2h-2z" fill="#a855f7" opacity="0.8"/>
+  </g>
+
+  <!-- Segmented Custom Tab Bar -->
+  <g transform="translate(30, 335)">
+    <rect width="390" height="42" rx="10" fill="#0d0a14" />
+    
+    <!-- Left Tab (Unselected - Media Library) -->
+    <g transform="translate(4, 4)">
+      <rect width="188" height="34" rx="8" fill="transparent" />
+      <text x="94" y="21" fill="#8b5cf6" font-size="12" font-weight="bold" text-anchor="middle">Media Library (3)</text>
+    </g>
+
+    <!-- Right Tab (Selected - Device Access Control) -->
+    <g transform="translate(198, 4)">
+      <rect width="188" height="34" rx="8" fill="#1e1836" stroke="#443272" stroke-width="1" />
+      <text x="94" y="21" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">Device Access (2)</text>
+    </g>
+  </g>
+
+  <!-- Active Connections Control Dashboard List -->
+  <g transform="translate(30, 400)">
+    <text x="0" y="0" fill="#a855f7" font-size="11" font-weight="bold" letter-spacing="1.5">CONNECTED NETWORK DASHBOARD</text>
+    <text x="390" y="0" fill="#ef4444" font-size="11" font-weight="bold" text-anchor="end">CLEAR ALL</text>
+
+    <!-- Device 1: Authorized -->
+    <g transform="translate(0, 18)">
+      <rect width="390" height="78" rx="14" fill="#140f25" stroke="#2c1e47" stroke-width="1" />
+      
+      <!-- Device Brand Circle -->
+      <rect x="15" y="15" width="48" height="48" rx="10" fill="#20173d" />
+      <!-- Smartphone Icon -->
+      <path d="M35 25h10v22H35zm0-4h10v2H35zm5 25a1 1 0 100 2 1 1 0 000-2z" fill="#8b5cf6" transform="translate(4,4) scale(0.85)"/>
+      
+      <!-- Device Details -->
+      <text x="76" y="33" fill="#ffffff" font-size="13" font-weight="bold">192.168.1.23</text>
+      <text x="76" y="49" fill="#9ca3af" font-size="11">Android Chrome Browser</text>
+      <text x="76" y="63" fill="#8b5cf6" font-size="9" font-weight="bold">Requests: 42 • Active 3s ago</text>
+
+      <!-- Authorized Tag -->
+      <rect x="180" y="18" width="80" height="18" rx="4" fill="#10b981" fill-opacity="0.12" />
+      <text x="220" y="31" fill="#10b981" font-size="8" font-weight="bold" text-anchor="middle">AUTHORIZED</text>
+
+      <!-- Action Button -->
+      <g transform="translate(310, 24)">
+        <rect width="65" height="30" rx="8" fill="url(#blockBtn)" />
+        <text x="32.5" y="19" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">Block</text>
+      </g>
+    </g>
+
+    <!-- Device 2: Blocked -->
+    <g transform="translate(0, 110)">
+      <rect width="390" height="78" rx="14" fill="#1a0c16" stroke="#4c1d24" stroke-width="1" />
+      
+      <!-- Device Brand Circle -->
+      <rect x="15" y="15" width="48" height="48" rx="10" fill="#36131c" />
+      <!-- Laptop Terminal Icon -->
+      <path d="M12 12h24v18H12zm2 20h20v2H14z" fill="#ef4444" transform="translate(4,4) scale(0.85)"/>
+      
+      <!-- Device Details -->
+      <text x="76" y="33" fill="#ef4444" font-size="13" font-weight="bold">192.168.1.45</text>
+      <text x="76" y="49" fill="#9ca3af" font-size="11">Terminal Client (cURL / Wget)</text>
+      <text x="76" y="63" fill="#8b5cf6" font-size="9" font-weight="bold">Requests: 3 • Active 15m ago</text>
+
+      <!-- Blocked Tag -->
+      <rect x="180" y="18" width="80" height="18" rx="4" fill="#ef4444" fill-opacity="0.12" />
+      <text x="220" y="31" fill="#ef4444" font-size="8" font-weight="bold" text-anchor="middle">BLOCKED</text>
+
+      <!-- Action Button -->
+      <g transform="translate(310, 24)">
+        <rect width="65" height="30" rx="8" fill="url(#cyberAccent)" />
+        <text x="32.5" y="19" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">Allow</text>
+      </g>
+    </g>
+
+    <!-- Security Information Footer Message -->
+    <g transform="translate(0, 205)">
+      <rect width="390" height="75" rx="12" fill="#0d0a14" stroke="#22173d" stroke-width="1" />
+      <!-- Shield Lock Icon representation -->
+      <path d="M18 10l-12 5v9c0 5.5 3.5 10.7 8.5 12 5-1.3 8.5-6.5 8.5-12v-9l-12-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" fill="#10b981" transform="translate(15, 20) scale(0.9)"/>
+      <text x="50" y="33" fill="#ffffff" font-size="12" font-weight="bold">Security Shield Active</text>
+      <text x="50" y="48" fill="#8b5cf6" font-size="9.5">Unidentified LAN requests require host permission.</text>
+      <text x="50" y="60" fill="#8b5cf6" font-size="9.5">Toggle dynamic access authorization instantly.</text>
+    </g>
+  </g>
+</svg>

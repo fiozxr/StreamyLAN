@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%" style="font-family: system-ui, -apple-system, sans-serif;">
+  <!-- Background Gradients -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#140b2b" />
+      <stop offset="100%" stop-color="#05030a" />
+    </radialGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#181329" />
+      <stop offset="100%" stop-color="#100b1a" />
+    </linearGradient>
+    <!-- Drop Shadows -->
+    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- Main Canvas -->
+  <rect width="800" height="450" rx="16" fill="url(#bg)" />
+  <rect width="800" height="450" rx="16" fill="none" stroke="#2c1e47" stroke-width="2" />
+
+  <!-- Browser Header Frame -->
+  <g opacity="0.85">
+    <rect x="0" y="0" width="800" height="42" rx="16" fill="#0d0a14" />
+    <!-- Browser Dots -->
+    <circle cx="24" cy="21" r="5" fill="#ef4444" />
+    <circle cx="40" cy="21" r="5" fill="#eab308" />
+    <circle cx="56" cy="21" r="5" fill="#22c55e" />
+    <!-- Browser URL Bar -->
+    <rect x="120" y="10" width="560" height="22" rx="6" fill="#1b1527" />
+    <text x="135" y="25" fill="#8b5cf6" font-size="11" letter-spacing="0.5">http://192.168.1.14:8080/</text>
+  </g>
+
+  <!-- Web Client Header -->
+  <g transform="translate(40, 75)">
+    <!-- Brand Title -->
+    <text x="0" y="25" fill="#ffffff" font-size="24" font-weight="900" letter-spacing="1">streamy<tspan fill="#a855f7">LAN</tspan></text>
+    <text x="0" y="42" fill="#9ca3af" font-size="12">Mobile Media Streaming Hub &amp; Share Server</text>
+    
+    <!-- Status Indicator -->
+    <g transform="translate(610, 10)">
+      <rect width="110" height="30" rx="15" fill="#100b1a" stroke="#10b981" stroke-width="1" />
+      <circle cx="20" cy="15" r="5" fill="#10b981" filter="url(#glow)"/>
+      <text x="34" y="19" fill="#10b981" font-size="11" font-weight="bold" letter-spacing="0.5">LIVE SERVER</text>
+    </g>
+  </g>
+
+  <!-- Left Side: Shared Files Grid -->
+  <g transform="translate(40, 155)">
+    <text x="0" y="-10" fill="#a855f7" font-size="12" font-weight="bold" letter-spacing="1.5">SHARED MEDIA LIBRARY</text>
+
+    <!-- File Item Card 1 -->
+    <g transform="translate(0, 5)" filter="url(#shadow)">
+      <rect width="440" height="70" rx="10" fill="url(#cardGrad)" stroke="#2c1e47" stroke-width="1" />
+      <!-- Thumbnail/Icon placeholder -->
+      <rect x="12" y="12" width="46" height="46" rx="6" fill="#2c1e47" />
+      <path d="M30 25l13 10-13 10V25z" fill="#a855f7" />
+      
+      <!-- Video Information -->
+      <text x="74" y="32" fill="#ffffff" font-size="13" font-weight="bold">Interstellar_1080p_Special_Edition.mp4</text>
+      <text x="74" y="48" fill="#9ca3af" font-size="11">Size: 2.45 GB • Format: MP4 Video • Bitrate: High</text>
+
+      <!-- Action Buttons -->
+      <g transform="translate(320, 20)">
+        <rect width="50" height="30" rx="6" fill="url(#primaryGrad)" />
+        <text x="25" y="19" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">PLAY</text>
+      </g>
+      <g transform="translate(378, 20)">
+        <rect width="50" height="30" rx="6" fill="#1e1833" stroke="#3b2b5c" stroke-width="1" />
+        <text x="25" y="19" fill="#9ca3af" font-size="11" font-weight="bold" text-anchor="middle">SAVE</text>
+      </g>
+    </g>
+
+    <!-- File Item Card 2 -->
+    <g transform="translate(0, 90)" filter="url(#shadow)">
+      <rect width="440" height="70" rx="10" fill="url(#cardGrad)" stroke="#2c1e47" stroke-width="1" />
+      <!-- Thumbnail/Icon placeholder -->
+      <rect x="12" y="12" width="46" height="46" rx="6" fill="#2c1e47" />
+      <path d="M30 25l13 10-13 10V25z" fill="#a855f7" />
+      
+      <!-- Video Information -->
+      <text x="74" y="32" fill="#ffffff" font-size="13" font-weight="bold">Nature_Wildfire_Relaxation_4K.mkv</text>
+      <text x="74" y="48" fill="#9ca3af" font-size="11">Size: 1.84 GB • Format: MKV Video • Bitrate: Ultra</text>
+
+      <!-- Action Buttons -->
+      <g transform="translate(320, 20)">
+        <rect width="50" height="30" rx="6" fill="url(#primaryGrad)" />
+        <text x="25" y="19" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">PLAY</text>
+      </g>
+      <g transform="translate(378, 20)">
+        <rect width="50" height="30" rx="6" fill="#1e1833" stroke="#3b2b5c" stroke-width="1" />
+        <text x="25" y="19" fill="#9ca3af" font-size="11" font-weight="bold" text-anchor="middle">SAVE</text>
+      </g>
+    </g>
+
+    <!-- File Item Card 3 -->
+    <g transform="translate(0, 175)" filter="url(#shadow)">
+      <rect width="440" height="70" rx="10" fill="url(#cardGrad)" stroke="#1a1426" opacity="0.6" stroke-width="1" />
+      <!-- Thumbnail/Icon placeholder -->
+      <rect x="12" y="12" width="46" height="46" rx="6" fill="#1a1426" />
+      <path d="M30 25l13 10-13 10V25z" fill="#9ca3af" />
+      
+      <!-- Video Information -->
+      <text x="74" y="32" fill="#a6a6a6" font-size="13" font-weight="bold">Vacation_Memories_Recap_2026.mp4</text>
+      <text x="74" y="48" fill="#6b7280" font-size="11">Size: 324 MB • Format: MP4 Video • Bitrate: Standard</text>
+
+      <!-- Action Buttons -->
+      <g transform="translate(320, 20)">
+        <rect width="50" height="30" rx="6" fill="url(#primaryGrad)" opacity="0.6" />
+        <text x="25" y="19" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle">PLAY</text>
+      </g>
+      <g transform="translate(378, 20)">
+        <rect width="50" height="30" rx="6" fill="#1a1426" stroke="#251a3a" stroke-width="1" />
+        <text x="25" y="19" fill="#6b7280" font-size="11" font-weight="bold" text-anchor="middle">SAVE</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Right Side: Terminal Command Desk / CLI Integration -->
+  <g transform="translate(500, 155)">
+    <text x="0" y="-10" fill="#10b981" font-size="12" font-weight="bold" letter-spacing="1.5">TERMINAL INTEGRATION</text>
+    
+    <rect width="260" height="245" rx="10" fill="#0b0812" stroke="#2c1e47" stroke-width="1.5" />
+    
+    <!-- Code Editor Tab -->
+    <rect x="1" y="1" width="258" height="30" rx="9" fill="#140f21" />
+    <circle cx="15" cy="15" r="4" fill="#a855f7" />
+    <text x="26" y="19" fill="#9ca3af" font-size="10" font-family="monospace">bash_commands.sh</text>
+
+    <!-- Command Snippet 1 (cURL) -->
+    <g transform="translate(15, 45)">
+      <text x="0" y="15" fill="#10b981" font-size="10" font-weight="bold" font-family="monospace"># cURL download file</text>
+      <rect x="0" y="22" width="230" height="32" rx="4" fill="#151026" />
+      <text x="8" y="41" fill="#cbd5e1" font-size="9" font-family="monospace">curl -L -o "mv.mp4" "http://192.168.1.../1"</text>
+    </g>
+
+    <!-- Command Snippet 2 (Wget) -->
+    <g transform="translate(15, 110)">
+      <text x="0" y="15" fill="#10b981" font-size="10" font-weight="bold" font-family="monospace"># Wget download file</text>
+      <rect x="0" y="22" width="230" height="32" rx="4" fill="#151026" />
+      <text x="8" y="41" fill="#cbd5e1" font-size="9" font-family="monospace">wget -O "mv.mp4" "http://192.168.1.1.../1"</text>
+    </g>
+
+    <!-- Command Snippet 3 (VLC Play) -->
+    <g transform="translate(15, 175)">
+      <text x="0" y="15" fill="#a855f7" font-size="10" font-weight="bold" font-family="monospace"># VLC stream direct</text>
+      <rect x="0" y="22" width="230" height="32" rx="4" fill="#151026" />
+      <text x="8" y="41" fill="#cbd5e1" font-size="9" font-family="monospace">vlc "http://192.168.1.14:8080/files/1"</text>
+    </g>
+  </g>
+</svg>

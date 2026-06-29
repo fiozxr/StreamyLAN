@@ -4,6 +4,15 @@
 
 ---
 
+## 📸 Interface Previews
+
+| **Web Client Dashboard** | **Android App Interface** |
+|:---:|:---:|
+| <img src="assets/web_client_preview.svg" width="520" alt="streamyLAN Web Client Dashboard" /> | <img src="assets/android_app_preview.svg" width="230" alt="streamyLAN Android App Dashboard" /> |
+| *Modern dark-themed responsive browser interface showing shared files grid and copyable terminal CLI instructions.* | *Clean, single-view Jetpack Compose mobile panel featuring central pulsing server controls and the connection firewall dashboard.* |
+
+---
+
 ## 🚀 Key Features
 
 - **Local Web Server**: Instantly broadcast video content to any browser on the same network (smart TVs, laptops, tablets, PCs).
