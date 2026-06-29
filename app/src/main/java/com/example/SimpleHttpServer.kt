@@ -948,6 +948,11 @@ class SimpleHttpServer(
                                 <div class="spinner-circle"></div>
                             </div>
                             
+                            <!-- Resume Notification -->
+                            <div id="resume-toast" style="display: none; position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background-color: rgba(16, 185, 129, 0.95); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; font-family: sans-serif; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); pointer-events: none; transition: opacity 0.3s ease-in-out;">
+                                <span id="resume-toast-text">Resumed playback</span>
+                            </div>
+                            
                             <!-- Large Center Play Button Overlay -->
                             <div class="center-play-btn" id="center-play-btn">
                                 <svg viewBox="0 0 24 24" width="32" height="32"><path d="M8 5v14l11-7z" fill="white"/></svg>
@@ -996,6 +1001,19 @@ class SimpleHttpServer(
                                     </div>
                                     
                                     <div class="controls-right">
+                                        <!-- Playback Speed Control -->
+                                        <div class="speed-control-container" style="position: relative; display: flex; align-items: center; margin-right: 4px;">
+                                            <button class="control-btn" id="ctrl-speed" title="Playback Speed" style="font-size: 0.8rem; font-weight: bold; width: auto; padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); font-family: monospace;">1.0x</button>
+                                            <select id="speed-select" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                                                <option value="0.5">0.5x</option>
+                                                <option value="0.75">0.75x</option>
+                                                <option value="1.0" selected>1.0x</option>
+                                                <option value="1.25">1.25x</option>
+                                                <option value="1.5">1.5x</option>
+                                                <option value="2.0">2.0x</option>
+                                            </select>
+                                        </div>
+
                                         <!-- Fullscreen Button -->
                                         <button class="control-btn" id="ctrl-fullscreen" title="Fullscreen (F)">
                                             <svg viewBox="0 0 24 24" class="icon-fs-enter"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
@@ -1101,6 +1119,7 @@ class SimpleHttpServer(
         }
 
         let playerInited = false;
+        let lastPlayedId = null;
 
         function initCustomControls() {
             if (playerInited) return;
@@ -1191,7 +1210,27 @@ class SimpleHttpServer(
                 timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
             }
 
-            video.addEventListener('timeupdate', updateProgress);
+            video.addEventListener('timeupdate', () => {
+                updateProgress();
+                if (lastPlayedId !== null && video.currentTime > 0) {
+                    localStorage.setItem('streamyLAN_resume_' + lastPlayedId, video.currentTime);
+                }
+            });
+
+            // Playback speed selector logic
+            const speedSelect = document.getElementById('speed-select');
+            const speedBtn = document.getElementById('ctrl-speed');
+            if (speedSelect && speedBtn) {
+                // Initialize default speed
+                video.playbackRate = parseFloat(speedSelect.value || "1.0");
+                speedBtn.textContent = video.playbackRate.toFixed(1) + 'x';
+
+                speedSelect.addEventListener('change', () => {
+                    const speed = parseFloat(speedSelect.value);
+                    video.playbackRate = speed;
+                    speedBtn.textContent = speed.toFixed(1) + 'x';
+                });
+            }
 
             // Dynamic Buffering Visuals
             function updateBuffered() {
@@ -1321,9 +1360,39 @@ class SimpleHttpServer(
             });
         }
 
+        function showResumeToast(time) {
+            const toast = document.getElementById('resume-toast');
+            const toastText = document.getElementById('resume-toast-text');
+            if (!toast || !toastText) return;
+
+            const m = Math.floor(time / 60);
+            const s = Math.floor(time % 60);
+            const timeStr = m.toString().padStart(2, '0') + ':' + s.toString().padStart(2, '0');
+
+            toastText.textContent = "Resumed playback from " + timeStr;
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
         function playFile(id) {
             const file = files.find(f => f.id === id);
             if (!file) return;
+
+            const player = document.getElementById('video-player');
+
+            // Save progress of current video before switching
+            if (lastPlayedId !== null && player && player.currentTime > 0) {
+                localStorage.setItem('streamyLAN_resume_' + lastPlayedId, player.currentTime);
+            }
+            
+            lastPlayedId = id;
 
             // Mark Item Active
             document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
@@ -1331,9 +1400,19 @@ class SimpleHttpServer(
             if (activeItem) activeItem.classList.add('active');
 
             // Set Video Source
-            const player = document.getElementById('video-player');
             player.src = file.url;
             player.load();
+
+            // Try to resume from stored position
+            const resumeTime = localStorage.getItem('streamyLAN_resume_' + id);
+            if (resumeTime) {
+                const parsedTime = parseFloat(resumeTime);
+                if (parsedTime > 1) { // Only resume if played past first second
+                    player.currentTime = parsedTime;
+                    showResumeToast(parsedTime);
+                }
+            }
+
             player.play().catch(err => console.log('Autoplay blocked, click play to stream'));
 
             // Init custom overlay controllers

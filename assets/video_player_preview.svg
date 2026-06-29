@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%" style="font-family: system-ui, -apple-system, sans-serif;">
+  <!-- Background Gradients -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#140b2b" />
+      <stop offset="100%" stop-color="#05030a" />
+    </radialGradient>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="purpleGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.0" />
+    </linearGradient>
+    <!-- Drop Shadows -->
+    <filter id="glow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Main Canvas -->
+  <rect width="800" height="450" rx="16" fill="url(#bg)" />
+  <rect width="800" height="450" rx="16" fill="none" stroke="#2c1e47" stroke-width="2" />
+
+  <!-- Background decorative glows -->
+  <circle cx="400" cy="225" r="300" fill="url(#purpleGlow)" filter="url(#glow)" opacity="0.5"/>
+
+  <!-- Browser Header Frame -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="30" width="700" height="390" rx="12" fill="#0b0813" stroke="#2a1d45" stroke-width="1.5" />
+    
+    <!-- Title Bar -->
+    <rect x="50" y="30" width="700" height="36" rx="12" fill="#07050d" />
+    <!-- Window buttons -->
+    <circle cx="74" cy="48" r="5" fill="#ef4444" />
+    <circle cx="90" cy="48" r="5" fill="#eab308" />
+    <circle cx="106" cy="48" r="5" fill="#22c55e" />
+    
+    <!-- Tab URL -->
+    <rect x="180" y="36" width="440" height="24" rx="6" fill="#140f24" />
+    <text x="400" y="52" fill="#8c7db3" font-size="11" text-anchor="middle" font-family="monospace">http://192.168.1.50:8080/play/1</text>
+  </g>
+
+  <!-- Video Player Content -->
+  <g transform="translate(70, 80)" filter="url(#shadow)">
+    <!-- Video Canvas Base -->
+    <rect width="660" height="320" rx="8" fill="#030206" />
+    
+    <!-- Simulated Movie Screen: Beautiful cosmic space scene -->
+    <clipPath id="videoClip">
+      <rect width="660" height="320" rx="8" />
+    </clipPath>
+    <g clip-path="url(#videoClip)">
+      <!-- Stars/Nebula background -->
+      <circle cx="450" cy="120" r="140" fill="#a855f7" opacity="0.35" filter="url(#glow)" />
+      <circle cx="180" cy="180" r="100" fill="#6366f1" opacity="0.25" filter="url(#glow)" />
+      <path d="M 0 280 Q 200 200 400 270 T 660 220 L 660 320 L 0 320 Z" fill="#130e26" opacity="0.8" />
+      <path d="M 0 300 Q 150 250 350 290 T 660 270 L 660 320 L 0 320 Z" fill="#1b1433" opacity="0.9" />
+
+      <!-- Rotating Ring / Hologram visual representing movie metadata -->
+      <ellipse cx="330" cy="160" rx="120" ry="40" fill="none" stroke="url(#primaryGrad)" stroke-width="3" opacity="0.6" filter="url(#glow)" />
+      <ellipse cx="330" cy="160" rx="120" ry="40" fill="none" stroke="#ffffff" stroke-width="1" stroke-dasharray="8 8" opacity="0.4" />
+      <circle cx="330" cy="160" r="15" fill="#ffffff" opacity="0.8" filter="url(#glow)" />
+      
+      <!-- Text Indicator for Media Title -->
+      <text x="330" y="230" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle" letter-spacing="1">COSMIC_VOYAGE_HDR.mp4</text>
+      
+      <!-- Resume Playback Toast (Featured Item) -->
+      <g transform="translate(330, 45)" filter="url(#shadow)">
+        <rect x="-140" y="-18" width="280" height="36" rx="18" fill="#10b981" opacity="0.95" />
+        <circle cx="-115" cy="0" r="8" fill="#ffffff" opacity="0.2" />
+        <!-- Small Play Icon in toast -->
+        <path d="M -118 -4 L -111 0 L -118 4 Z" fill="#ffffff" />
+        <text x="-95" y="5" fill="#ffffff" font-size="12" font-weight="bold">Resumed playback from 14:22</text>
+      </g>
+      
+      <!-- Dark gradient overlay at the bottom for controls readability -->
+      <rect x="0" y="240" width="660" height="80" fill="url(#bottomShadow)" opacity="0.9" />
+    </g>
+
+    <!-- Controls Overlay Container -->
+    <g transform="translate(0, 250)">
+      <!-- Progress Bar Container -->
+      <g transform="translate(15, 10)">
+        <!-- Rail -->
+        <rect width="630" height="4" rx="2" fill="#2c1e47" />
+        <!-- Buffered -->
+        <rect width="480" height="4" rx="2" fill="#4d377c" />
+        <!-- Current Progress Fill -->
+        <rect width="320" height="4" rx="2" fill="url(#primaryGrad)" filter="url(#glow)" />
+        <!-- Playhead -->
+        <circle cx="320" cy="2" r="6" fill="#ffffff" filter="url(#shadow)" />
+      </g>
+
+      <!-- Controls Action Row -->
+      <g transform="translate(15, 36)">
+        <!-- LEFT CONTROLS -->
+        <!-- Play/Pause Icon -->
+        <g transform="translate(0, -10)">
+          <!-- Circle Backing -->
+          <circle cx="12" cy="12" r="14" fill="#ffffff" fill-opacity="0.1" />
+          <path d="M 9 6 L 9 18 L 19 12 Z" fill="#ffffff" />
+        </g>
+        
+        <!-- Rewind 10s -->
+        <g transform="translate(35, -10)" opacity="0.85">
+          <circle cx="12" cy="12" r="14" fill="#ffffff" fill-opacity="0.0" />
+          <path d="M12 5V1l-5 4 5 4V5c3.3 0 6 2.7 6 6s-2.7 6-6 6-6-2.7-6-6H4c0 4.4 3.6 8 8 8s8-3.6 8-8-3.6-8-8-8z" fill="#ffffff" />
+          <text x="12" y="14" fill="#ffffff" font-size="7" font-weight="bold" text-anchor="middle">10</text>
+        </g>
+
+        <!-- Fast Forward 10s -->
+        <g transform="translate(70, -10)" opacity="0.85">
+          <circle cx="12" cy="12" r="14" fill="#ffffff" fill-opacity="0.0" />
+          <path d="M12 5V1l5 4-5 4V5c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6h2c0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8z" fill="#ffffff" />
+          <text x="12" y="14" fill="#ffffff" font-size="7" font-weight="bold" text-anchor="middle">10</text>
+        </g>
+
+        <!-- Volume Speaker & Slider -->
+        <g transform="translate(110, -10)">
+          <!-- Speaker icon -->
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="#ffffff" opacity="0.9" />
+          <!-- Small Volume bar slider -->
+          <rect x="22" y="10" width="50" height="4" rx="2" fill="#2c1e47" />
+          <rect x="22" y="10" width="35" height="4" rx="2" fill="#ffffff" />
+          <circle cx="57" cy="12" r="4" fill="#ffffff" />
+        </g>
+
+        <!-- Time counter -->
+        <text x="210" y="2" fill="#ffffff" font-size="11" font-family="monospace" opacity="0.85">14:22 / 31:45</text>
+
+        <!-- RIGHT CONTROLS -->
+        <!-- Playback Speed Dropdown (Featured Item) -->
+        <g transform="translate(560, -10)">
+          <!-- Styled Speed Badge Pill -->
+          <rect x="-10" y="-3" width="50" height="20" rx="4" fill="#a855f7" />
+          <text x="15" y="11" fill="#ffffff" font-size="10" font-weight="bold" font-family="monospace" text-anchor="middle">1.25x</text>
+          <!-- Tiny Chevron down -->
+          <path d="M 33 6 L 36 9 L 39 6" fill="none" stroke="#ffffff" stroke-width="1.5" />
+        </g>
+
+        <!-- Fullscreen Button -->
+        <g transform="translate(615, -10)">
+          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" fill="#ffffff" opacity="0.9" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
