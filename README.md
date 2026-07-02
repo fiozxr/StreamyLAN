@@ -106,10 +106,6 @@ Did you know that streaming video files over a standard local Wi-Fi router (usin
 
 ---
 
-## 🏆 Credits
+## Contribution ?
 
-Built with passion and crafted meticulously using:
-- **Google AI Studio** & **Antigravity AI Coding Agent**
-- **Jetpack Compose** (Material Design 3 Components)
-- **Robolectric & Roborazzi** for screenshot validation
-- Developed by the `streamyLAN` Open Source Community.
+We Need Help !
