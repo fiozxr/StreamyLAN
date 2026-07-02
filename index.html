@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamyLAN — Mobile Media Hub & LAN Streamer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        sand: {
+                            50: '#fdfcf8',
+                            100: '#f7f5f0',
+                            200: '#efece4',
+                            300: '#e2ddd1',
+                            400: '#cfc8b8',
+                            500: '#b5ad9a',
+                            600: '#9a917c',
+                            700: '#7d7563',
+                            800: '#5e5749',
+                            900: '#3d3830',
+                            950: '#1c1a17',
+                        },
+                        clay: {
+                            50: '#f9f7f5',
+                            100: '#f0ece7',
+                            200: '#e0d8cf',
+                            300: '#c9bdb0',
+                            400: '#b09f8e',
+                            500: '#9a8774',
+                            600: '#87725f',
+                            700: '#705d4d',
+                            800: '#5d4d40',
+                            900: '#4a3d34',
+                            950: '#28211c',
+                        },
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                            950: '#451a03',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-up': 'fadeUp 0.8s ease-out forwards',
+                        'shimmer': 'shimmer 2.5s linear infinite',
+                        'pulse-ring': 'pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' },
+                        },
+                        pulseRing: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+                            '100%': { transform: 'scale(1.3)', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(253, 252, 248, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .dark .glass {
+            background: rgba(28, 26, 23, 0.7);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #5e5749 0%, #3d3830 50%, #5e5749 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(135deg, #cfc8b8 0%, #f7f5f0 50%, #cfc8b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .code-block {
+            background: #1c1a17;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .feature-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+        }
+        .dark .feature-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(255, 255, 255, 0.04);
+        }
+        .feature-card:hover {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(94, 87, 73, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(94, 87, 73, 0.04) 1px, transparent 1px);
+            background-size: 80px 80px;
+        }
+        .dark .grid-bg {
+            background-image: 
+                linear-gradient(rgba(207, 200, 184, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(207, 200, 184, 0.025) 1px, transparent 1px);
+        }
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .terminal-line {
+            opacity: 0;
+            animation: typeIn 0.4s ease forwards;
+        }
+        @keyframes typeIn {
+            to { opacity: 1; }
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background: currentColor;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .phone-mockup {
+            border-radius: 40px;
+            box-shadow: 
+                0 0 0 2px rgba(94, 87, 73, 0.1),
+                0 25px 50px -12px rgba(0, 0, 0, 0.15),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .dark .phone-mockup {
+            box-shadow: 
+                0 0 0 2px rgba(207, 200, 184, 0.1),
+                0 25px 50px -12px rgba(0, 0, 0, 0.4),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .speed-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        .range-indicator {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="font-sans text-sand-900 bg-sand-50 dark:bg-sand-950 dark:text-sand-200 transition-colors duration-700 antialiased selection:bg-sand-300 dark:selection:bg-sand-700">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-sand-200/40 dark:border-sand-800/40 transition-all duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2.5 group">
+                <div class="w-8 h-8 rounded-xl bg-sand-900 dark:bg-sand-100 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <svg class="w-4 h-4 text-sand-50 dark:text-sand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/>
+                    </svg>
+                </div>
+                <span class="font-semibold text-lg tracking-tight">StreamyLAN</span>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-10 text-sm font-medium text-sand-500 dark:text-sand-400">
+                <a href="#features" class="nav-link hover:text-sand-900 dark:hover:text-sand-100 transition-colors">Features</a>
+                <a href="#how-it-works" class="nav-link hover:text-sand-900 dark:hover:text-sand-100 transition-colors">How It Works</a>
+                <a href="#dev" class="nav-link hover:text-sand-900 dark:hover:text-sand-100 transition-colors">Developers</a>
+                <a href="https://github.com/fiozxr/streamylan" target="_blank" class="nav-link hover:text-sand-900 dark:hover:text-sand-100 transition-colors">GitHub</a>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="p-2.5 rounded-xl hover:bg-sand-200/50 dark:hover:bg-sand-800/50 transition-all duration-300" aria-label="Toggle theme">
+                    <svg class="w-5 h-5 hidden dark:block text-sand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg class="w-5 h-5 block dark:hidden text-sand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <a href="https://github.com/fiozxr/streamylan" target="_blank" class="hidden sm:flex items-center gap-2 px-4 py-2 bg-sand-900 dark:bg-sand-100 text-sand-50 dark:text-sand-900 rounded-xl text-sm font-medium hover:opacity-90 transition-all duration-300 hover:scale-105">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    Star
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden grid-bg">
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-clay-300/15 dark:bg-clay-700/10 rounded-full blur-[100px] animate-pulse-slow"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-amber-400/5 dark:bg-amber-600/5 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 2.5s;"></div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+            <div class="text-center lg:text-left">
+                <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-sand-200/50 dark:bg-sand-800/40 border border-sand-300/30 dark:border-sand-700/30 text-xs font-mono text-sand-600 dark:text-sand-400 mb-10 animate-fade-up">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    Offline-First · Zero Internet · 450 Mbps
+                </div>
+
+                <h1 class="text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tighter mb-8 animate-fade-up" style="animation-delay: 0.1s;">
+                    <span class="gradient-text">StreamyLAN</span>
+                </h1>
+                
+                <p class="text-xl sm:text-2xl text-sand-500 dark:text-sand-400 font-light max-w-xl mb-5 leading-snug animate-fade-up" style="animation-delay: 0.2s;">
+                    Your phone. Your Wi-Fi. Your cinema.
+                </p>
+                
+                <p class="text-base sm:text-lg text-sand-400 dark:text-sand-500 max-w-lg mb-12 leading-relaxed animate-fade-up" style="animation-delay: 0.3s;">
+                    Transform any Android device into a high-performance local media server. Stream 4K HDR to any screen on your network — no internet, no cloud, no limits.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4 animate-fade-up" style="animation-delay: 0.4s;">
+                    <a href="#how-it-works" class="group px-8 py-4 bg-sand-900 dark:bg-sand-100 text-sand-50 dark:text-sand-900 rounded-2xl font-medium hover:scale-105 transition-all duration-300 flex items-center gap-2 shadow-lg shadow-sand-900/10 dark:shadow-sand-100/10">
+                        Get Started
+                        <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                    </a>
+                    <a href="https://github.com/fiozxr/streamylan" target="_blank" class="px-8 py-4 border border-sand-300 dark:border-sand-700 rounded-2xl font-medium hover:bg-sand-100 dark:hover:bg-sand-800/50 transition-all duration-300">
+                        View on GitHub
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-14 flex items-center justify-center lg:justify-start gap-10 animate-fade-up" style="animation-delay: 0.5s;">
+                    <div>
+                        <div class="text-2xl font-bold text-sand-900 dark:text-sand-100">0ms</div>
+                        <div class="text-xs text-sand-500 dark:text-sand-500 mt-1">Latency</div>
+                    </div>
+                    <div class="w-px h-10 bg-sand-300 dark:bg-sand-700"></div>
+                    <div>
+                        <div class="text-2xl font-bold text-sand-900 dark:text-sand-100">450<span class="text-sm font-normal text-sand-500 ml-0.5">Mbps</span></div>
+                        <div class="text-xs text-sand-500 dark:text-sand-500 mt-1">Transfer Speed</div>
+                    </div>
+                    <div class="w-px h-10 bg-sand-300 dark:bg-sand-700"></div>
+                    <div>
+                        <div class="text-2xl font-bold text-sand-900 dark:text-sand-100">4K<span class="text-sm font-normal text-sand-500 ml-0.5">HDR</span></div>
+                        <div class="text-xs text-sand-500 dark:text-sand-500 mt-1">Max Quality</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phone Mockup -->
+            <div class="relative flex justify-center animate-fade-up" style="animation-delay: 0.6s;">
+                <div class="phone-mockup w-72 sm:w-80 bg-sand-900 dark:bg-sand-800 p-3 relative overflow-hidden">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-sand-950 dark:bg-sand-950 rounded-b-2xl z-20"></div>
+                    <div class="rounded-[32px] overflow-hidden bg-sand-950 dark:bg-sand-950 aspect-[9/19] relative">
+                        <!-- App UI -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-sand-900 to-sand-950 p-5 flex flex-col">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between mb-6 mt-2">
+                                <div class="text-sand-100 font-semibold text-sm">StreamyLAN</div>
+                                <div class="flex gap-1.5">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                    <div class="text-xs text-emerald-400">Online</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Pulse Button -->
+                            <div class="flex-1 flex items-center justify-center">
+                                <div class="relative">
+                                    <div class="absolute inset-0 rounded-full bg-amber-500/20 animate-pulse-ring"></div>
+                                    <div class="absolute inset-0 rounded-full bg-amber-500/10 animate-pulse-ring" style="animation-delay: 0.5s;"></div>
+                                    <button class="relative w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 shadow-lg shadow-amber-500/30 flex items-center justify-center">
+                                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Server Info -->
+                            <div class="bg-sand-800/50 rounded-2xl p-4 mb-4 backdrop-blur-sm border border-sand-700/30">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-xs text-sand-400">Server URL</span>
+                                    <span class="text-xs text-emerald-400 font-mono">Running</span>
+                                </div>
+                                <div class="font-mono text-sm text-sand-200 bg-sand-900/50 rounded-lg px-3 py-2 border border-sand-700/30">
+                                    http://192.168.1.100:8080
+                                </div>
+                            </div>
+
+                            <!-- Files -->
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-sand-800/30 border border-sand-700/20">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-xs text-sand-200 truncate">Inception.2010.4K.HDR.mp4</div>
+                                        <div class="text-[10px] text-sand-500">14.2 GB · 2:28:00</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-sand-800/30 border border-sand-700/20">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-xs text-sand-200 truncate">Blade.Runner.2049.mp4</div>
+                                        <div class="text-[10px] text-sand-500">8.7 GB · 2:43:00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-40">
+            <svg class="w-5 h-5 text-sand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-32 sm:py-40 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-24 reveal">
+                <span class="text-xs font-mono text-sand-500 uppercase tracking-[0.2em]">Capabilities</span>
+                <h2 class="text-4xl sm:text-6xl font-bold mt-5 tracking-tight leading-tight">Everything You Need<br>to Stream Local</h2>
+                <p class="mt-6 text-sand-500 dark:text-sand-400 max-w-lg mx-auto text-lg leading-relaxed">No cloud. No subscriptions. Just your device and your Wi-Fi.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">High-Performance Server</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">Multi-threaded HTTP/1.1 socket server streams media to any device — Mac, PC, Linux, iOS, Android, Smart TVs — via clean browser-native HTML5 players.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">Advanced Video Controls</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">Dynamic 0.5x–2.0x playback speed, smart resume with local storage, double-tap fullscreen, and full keyboard shortcut support.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">Auto LAN Discovery</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">UDP subnet scan auto-detects other StreamyLAN nodes on your Wi-Fi. Tap Connect to browse peer libraries instantly.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">Live Firewall</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">Real-time network monitor shows all active client IPs and user agents. Block intrusive clients or clear cache instantly.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">CLI Terminal Friendly</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">Pre-generated, copyable cURL, wget, and VLC terminal commands for downloading or streaming over the local network.</p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card reveal p-8 rounded-3xl border border-sand-200 dark:border-sand-800 bg-white dark:bg-sand-900/30 group" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-7 transition-colors group-hover:bg-amber-100 dark:group-hover:bg-amber-900/30">
+                        <svg class="w-6 h-6 text-sand-700 dark:text-sand-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-3">HTTP Range Support</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed">Standard Range: bytes chunked serving for instant, buffer-free timeline scrubbing in browsers and external players like VLC.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-32 sm:py-40 px-6 bg-sand-100/50 dark:bg-sand-900/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-24 reveal">
+                <span class="text-xs font-mono text-sand-500 uppercase tracking-[0.2em]">Workflow</span>
+                <h2 class="text-4xl sm:text-6xl font-bold mt-5 tracking-tight leading-tight">Three Steps to<br>Your Private Cinema</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="reveal text-center group">
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-20 h-20 rounded-3xl bg-sand-900 dark:bg-sand-100 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                            <svg class="w-8 h-8 text-sand-50 dark:text-sand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">1</div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Add Media</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed max-w-xs mx-auto">Launch StreamyLAN on your Android device. Tap Add Media to choose any video, audio, or document from storage.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="reveal text-center group" style="transition-delay: 0.15s;">
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-20 h-20 rounded-3xl bg-sand-900 dark:bg-sand-100 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                            <svg class="w-8 h-8 text-sand-50 dark:text-sand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">2</div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Start Server</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed max-w-xs mx-auto">Select your TCP port and tap the central pulse button. Your local URL appears instantly — e.g., http://192.168.1.100:8080</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="reveal text-center group" style="transition-delay: 0.3s;">
+                    <div class="relative inline-flex mb-8">
+                        <div class="w-20 h-20 rounded-3xl bg-sand-900 dark:bg-sand-100 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
+                            <svg class="w-8 h-8 text-sand-50 dark:text-sand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">3</div>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Stream Anywhere</h3>
+                    <p class="text-sm text-sand-500 dark:text-sand-400 leading-relaxed max-w-xs mx-auto">Open any browser on your TV, laptop, or tablet. Browse, download, or play videos with premium controls — zero buffering.</p>
+                </div>
+            </div>
+
+            <!-- Connection Flow Diagram -->
+            <div class="mt-24 reveal">
+                <div class="relative bg-white dark:bg-sand-900/50 rounded-3xl border border-sand-200 dark:border-sand-800 p-8 sm:p-12 overflow-hidden">
+                    <div class="absolute inset-0 grid-bg opacity-50"></div>
+                    <div class="relative grid sm:grid-cols-3 gap-8 items-center text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-sand-600 dark:text-sand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="font-semibold text-sm">Android Phone</div>
+                            <div class="text-xs text-sand-500 mt-1">StreamyLAN Server</div>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-full h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent mb-4 relative">
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-sand-900 px-3">
+                                    <span class="text-xs font-mono text-amber-600 dark:text-amber-400">Wi-Fi LAN</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs font-mono text-sand-400">
+                                <span>0ms</span>
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>450 Mbps</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-2xl bg-sand-100 dark:bg-sand-800 flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-sand-600 dark:text-sand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <div class="font-semibold text-sm">Any Device</div>
+                            <div class="text-xs text-sand-500 mt-1">Browser / VLC / TV</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dev Section -->
+    <section id="dev" class="py-32 sm:py-40 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <span class="text-xs font-mono text-sand-500 uppercase tracking-[0.2em]">For Developers</span>
+                <h2 class="text-4xl sm:text-5xl font-bold mt-5 tracking-tight">Built with Modern<br>Android Stack</h2>
+            </div>
+
+            <div class="space-y-8 reveal">
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="p-6 rounded-2xl bg-white dark:bg-sand-900/30 border border-sand-200 dark:border-sand-800">
+                        <div class="text-xs font-mono text-sand-500 mb-2">Language</div>
+                        <div class="font-semibold">Kotlin 1.9.x</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-sand-900/30 border border-sand-200 dark:border-sand-800">
+                        <div class="text-xs font-mono text-sand-500 mb-2">Build Tool</div>
+                        <div class="font-semibold">Gradle 8.x</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-sand-900/30 border border-sand-200 dark:border-sand-800">
+                        <div class="text-xs font-mono text-sand-500 mb-2">Target SDK</div>
+                        <div class="font-semibold">Android SDK 34</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-white dark:bg-sand-900/30 border border-sand-200 dark:border-sand-800">
+                        <div class="text-xs font-mono text-sand-500 mb-2">UI Framework</div>
+                        <div class="font-semibold">Jetpack Compose</div>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="flex items-center justify-between px-5 py-3 border-b border-sand-800/50 bg-sand-950/50">
+                        <span class="text-xs text-sand-600 font-mono">Quick Build</span>
+                        <button onclick="copyCode(this)" class="text-xs text-sand-600 hover:text-sand-300 transition-colors flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            Copy
+                        </button>
+                    </div>
+                    <pre class="p-5 sm:p-6 text-sm text-sand-300 overflow-x-auto leading-relaxed"><code># Compile debug build
+gradle assembleDebug
+
+# Run linter
+gradle lint
+
+# Build release APK
+gradle assembleRelease
+
+# Run unit tests
+gradle :app:testDebugUnitTest</code></pre>
+                </div>
+
+                <div class="grid sm:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 rounded-xl bg-sand-100/50 dark:bg-sand-800/30">
+                        <div class="text-xs font-mono text-sand-500 mb-1">SimpleHttpServer.kt</div>
+                        <div class="text-sm font-medium">Core HTTP Server</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-sand-100/50 dark:bg-sand-800/30">
+                        <div class="text-xs font-mono text-sand-500 mb-1">DiscoveryManager.kt</div>
+                        <div class="text-sm font-medium">UDP LAN Discovery</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-sand-100/50 dark:bg-sand-800/30">
+                        <div class="text-xs font-mono text-sand-500 mb-1">ServerManager.kt</div>
+                        <div class="text-sm font-medium">State & Firewall</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-32 sm:py-40 px-6 bg-sand-100/50 dark:bg-sand-900/20">
+        <div class="max-w-3xl mx-auto text-center reveal">
+            <h2 class="text-4xl sm:text-6xl font-bold tracking-tight mb-8 leading-tight">Your Media.<br>Your Network.</h2>
+            <p class="text-sand-500 dark:text-sand-400 mb-12 text-lg leading-relaxed">No cloud uploads. No data caps. No subscription fees. Just pure local streaming at wire speed.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://github.com/fiozxr/streamylan" target="_blank" class="group px-8 py-4 bg-sand-900 dark:bg-sand-100 text-sand-50 dark:text-sand-900 rounded-2xl font-medium hover:scale-105 transition-all duration-300 flex items-center gap-2.5 shadow-lg shadow-sand-900/10 dark:shadow-sand-100/10">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-14 px-6 border-t border-sand-200 dark:border-sand-800/60">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded bg-sand-900 dark:bg-sand-100 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5 text-sand-50 dark:text-sand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/></svg>
+                </div>
+                <span class="text-sm font-medium text-sand-600 dark:text-sand-400">StreamyLAN</span>
+            </div>
+            
+            <div class="flex items-center gap-8 text-sm text-sand-500 dark:text-sand-500">
+                <a href="https://github.com/fiozxr/streamylan" target="_blank" class="hover:text-sand-900 dark:hover:text-sand-300 transition-colors">GitHub</a>
+                <a href="https://github.com/fiozxr/streamylan/issues" target="_blank" class="hover:text-sand-900 dark:hover:text-sand-300 transition-colors">Issues</a>
+                <span class="text-sand-300 dark:text-sand-700">·</span>
+                <span class="text-xs">Built with Kotlin & Jetpack Compose</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        // Initialize theme
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Scroll Reveal
+        const observerOptions = {
+            threshold: 0.08,
+            rootMargin: '0px 0px -60px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Copy Code
+        function copyCode(btn) {
+            const code = btn.closest('.code-block').querySelector('code').innerText;
+            navigator.clipboard.writeText(code);
+            const original = btn.innerHTML;
+            btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Copied`;
+            setTimeout(() => btn.innerHTML = original, 2000);
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                navbar.classList.add('shadow-sm');
+            } else {
+                navbar.classList.remove('shadow-sm');
+            }
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
