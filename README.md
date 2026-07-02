@@ -13,8 +13,6 @@ An ultra-lightweight, high-performance local network streaming and file-sharing 
 
 ---
 
-## 🔍 Description (SEO-Optimized)
-
 **streamyLAN** is a powerful offline-first **local Wi-Fi file sharing app** and **Android HTTP media server** that instantly transforms your mobile device into a high-bandwidth LAN streaming node. Designed for developers, power users, and movie enthusiasts, it provides seamless **LAN video streaming without internet**, allowing any laptop, Smart TV, or tablet on your network to stream or download media files directly via their web browsers. 
 
 With full support for **HTTP Range Requests (byte-range scrubbing)**, users can seek through multi-gigabyte 4K/HDR MP4/WebM videos with zero buffering. It integrates a secure **IP access control system (firewall)** to let hosts block or grant client access in real-time. Whether you are searching for a high-performance **offline file sender**, a **Wi-Fi server for terminal/CLI downloads**, or a **VLC-ready media streamer**, streamyLAN delivers absolute performance with modern Material Design 3 elegance.
